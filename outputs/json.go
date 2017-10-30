@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"io"
 	"net/url"
+	"os"
 	"time"
 
 	"github.com/aelsabbahy/goss/resource"
 	"github.com/fatih/color"
+	"github.com/malnick/goss/util"
 )
 
 type Json struct {
@@ -78,11 +80,26 @@ func makeMap(results <-chan []resource.TestResult, startTime time.Time) (map[str
 	summary["total-duration"] = duration
 	summary["summary-line"] = fmt.Sprintf("Count: %d, Failed: %d, Duration: %.3fs", testCount, failed, duration.Seconds())
 
+	hostname, _ := os.Hostname()
+	role, _ := getRole()
+
 	out := make(map[string]interface{})
+	out["role"] = role
+	out["hostname"] = hostname
 	out["results"] = resultsOut
 	out["summary"] = summary
 
 	return out, failed
+}
+
+func getRole() (string, error) {
+	c := util.NewCommand("/opt/puppetlabs/bin/facter", "role")
+
+	if err := c.Run(); err != nil {
+		return "", err
+	}
+
+	return c.Stdout.String(), nil
 }
 
 func struct2map(i interface{}) map[string]interface{} {
