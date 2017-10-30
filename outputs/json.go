@@ -11,9 +11,7 @@ import (
 	"github.com/fatih/color"
 )
 
-type Json struct {
-	Report *url.URL
-}
+type Json struct{}
 
 func (r Json) SetReportURL(stringified string) error {
 	u, err := url.Parse(stringified)
@@ -33,12 +31,6 @@ func (r Json) Output(w io.Writer, results <-chan []resource.TestResult, startTim
 
 	j, _ := json.MarshalIndent(out, "", "    ")
 	fmt.Fprintln(w, string(j))
-
-	if r.Report != nil {
-		if err := postReport(j, r.Report); err != nil {
-			fmt.Errorf("errors sending report: %s", err.Error())
-		}
-	}
 
 	if failed > 0 {
 		return 1

@@ -15,7 +15,6 @@ import (
 
 type Outputer interface {
 	Output(io.Writer, <-chan []resource.TestResult, time.Time) int
-	SetReportURL(string) error
 }
 
 var green = color.New(color.FgGreen).SprintfFunc()
