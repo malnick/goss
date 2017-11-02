@@ -82,9 +82,13 @@ func makeMap(results <-chan []resource.TestResult, startTime time.Time) (map[str
 	summary["summary-line"] = fmt.Sprintf("Count: %d, Failed: %d, Duration: %.3fs", testCount, failed, duration.Seconds())
 
 	hostname, _ := os.Hostname()
-	role, _ := getRole()
+	role, err := getRole()
+	if err != nil {
+		fmt.Errorf(err.Error())
+	}
 
 	out := make(map[string]interface{})
+	out["timestamp"] = time.Now().Format(time.RFC3339)
 	out["role"] = role
 	out["hostname"] = hostname
 	out["results"] = resultsOut
